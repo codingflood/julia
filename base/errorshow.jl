@@ -632,12 +632,15 @@ getindex(s::ExceptionStack, i) = s.stack[i]
 function show(io::IO, excstack::ExceptionStack)
     stack = excstack.stack
     nexc = length(stack)
-    printstyled(io, "ExceptionStack with ", nexc, " exception",
-                nexc != 1 ? "s" : "", nexc == 0 ? "" : ":\n")
+    printstyled(io, nexc, "-element ExceptionStack", nexc == 0 ? "" : ":\n")
     for i = nexc:-1:1
-        printstyled(io, "Caused by [", i, "]\n", color=:light_black)
-        excstack.has_backtraces ? showerror(io, stack[i]...) :
-                                  showerror(io, stack[i])
+        if excstack.has_backtraces
+            nexc != 1 && printstyled(io, "[exception ", i, "]\n", color=:light_black)
+            showerror(io, stack[i]...)
+        else
+            nexc != 1 && printstyled(io, "[exception ", i, "] ", color=:light_black)
+            showerror(io, stack[i])
+        end
         println(io)
     end
 end
